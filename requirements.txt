@@ -1,0 +1,12 @@
+jupyter
+numpy
+matplotlib
+gymnasium
+minigrid
+torch
+torchvision
+tensorboard
+black
+metrohash
+torch-tb-profiler
+pytest
