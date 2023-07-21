@@ -43,6 +43,9 @@ import time
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+Transition = namedtuple('Transition',
+                        ('currentState', 'action', 'nextState', 'reward'))
+
 class ReplayMemory(object):
     """
     Replay Memory class

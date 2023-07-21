@@ -8,3 +8,4 @@ torchvision
 tensorboard
 metrohash
 torch-tb-profiler
+pyyaml
