@@ -1,9 +1,3 @@
-# Author: Preston Govender
-
-"""
-Utility functions for the Deep Q Network
-"""
-
 # import 'gymnasium' and 'minigrid' for our environment
 import gymnasium as gym
 import minigrid
@@ -161,7 +155,7 @@ def save_model(policy_net, filename):
         policy_net (DQN): The policy network
         filename (str): The filename to save the model to
     """
-    torch.save(policy_net, filename)
+    torch.save(policy_net.state_dict(), filename)
 
 
 def load_model(filename):
@@ -215,9 +209,11 @@ class DQN(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
-    
 
-def select_action_e_greedy(state, stop_epsilon, start_epsilon, decay_rate, steps_done, numActions, policy_net):
+
+def select_action_e_greedy(
+    state, stop_epsilon, start_epsilon, decay_rate, steps_done, numActions, policy_net
+):
     """
     Select an action using an epsilon-greedy policy
 
@@ -236,16 +232,18 @@ def select_action_e_greedy(state, stop_epsilon, start_epsilon, decay_rate, steps
 
     # generate a random number
     sample = random.random()
-    
-    # calculate the epsilon threshold, based on the epsilon-start value, the epsilon-stop value, 
+
+    # calculate the epsilon threshold, based on the epsilon-start value, the epsilon-stop value,
     # the number of training steps taken and the epsilon decay rate
     # here we are using an exponential decay rate for the epsilon value
-    eps_threshold = stop_epsilon+(start_epsilon-stop_epsilon)*math.exp(-1. * steps_done / decay_rate)
-    
+    eps_threshold = stop_epsilon + (start_epsilon - stop_epsilon) * math.exp(
+        -1.0 * steps_done / decay_rate
+    )
+
     # compare the generated random number to the epsilon threshold
     if sample > eps_threshold:
         # act greedily towards the Q-values of our policy network, given the state
-        
+
         # we do not want to gather gradients as we are only generating experience, not training the network
         with torch.no_grad():
             # t.max(1) will return largest column value of each row.
@@ -254,8 +252,11 @@ def select_action_e_greedy(state, stop_epsilon, start_epsilon, decay_rate, steps
             return policy_net(state).max(1)[1].unsqueeze(0)
     else:
         # select a random action with equal probability
-        return torch.tensor([[random.randrange(numActions)]], device=device, dtype=torch.long)
-    
+        return torch.tensor(
+            [[random.randrange(numActions)]], device=device, dtype=torch.long
+        )
+
+
 class ReplayMemory(object):
     """
     Replay Memory class
@@ -280,6 +281,7 @@ class ReplayMemory(object):
     def __len__(self):
         return len(self.memory)
 
+
 def update_target_net(policy_net, target_net):
     """
     Update the target network with the weights and biases of the policy network
@@ -290,6 +292,7 @@ def update_target_net(policy_net, target_net):
     """
 
     target_net.load_state_dict(policy_net.state_dict())
+
 
 def device_specific_episodes(episodes):
     """
@@ -306,19 +309,20 @@ def device_specific_episodes(episodes):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Run for more episodes if using GPU
-    if device=="cuda":
-        return episodes*10
+    if device == "cuda":
+        return episodes * 10
     else:
         return episodes
-    
+
+
 def load_model(model, model_path):
     """
     Load the model
-    
+
     Parameters:
         model (DQN): The model to load the weights and biases into
         model_path (str): The path to the model to load
-        
+
         Returns:
             DQN: The model with the loaded weights and biases
     """
