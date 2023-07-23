@@ -201,7 +201,7 @@ class DQN(nn.Module):
         torch.nn.Module: A PyTorch neural network module.
     """
 
-    def __init__(self, inputSize, numActions, hiddenLayerSize=(64, 128)):
+    def __init__(self, inputSize, numActions, hiddenLayerSize=(256, 128)):
         super(DQN, self).__init__()
         self.fc1 = nn.Linear(inputSize, hiddenLayerSize[0])
         self.fc2 = nn.Linear(hiddenLayerSize[0], hiddenLayerSize[1])
@@ -310,3 +310,17 @@ def device_specific_episodes(episodes):
         return episodes*10
     else:
         return episodes
+    
+def load_model(model, model_path):
+    """
+    Load the model
+    
+    Parameters:
+        model (DQN): The model to load the weights and biases into
+        model_path (str): The path to the model to load
+        
+        Returns:
+            DQN: The model with the loaded weights and biases
+    """
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
