@@ -9,7 +9,6 @@ import gymnasium as gym
 import minigrid
 from minigrid.wrappers import *
 
-
 # import 'random' to generate random numbers
 import random
 
@@ -34,7 +33,7 @@ from collections import namedtuple, deque
 import pickle
 
 # Import 'pathlib' to check if the model exists
-from pathlib import exists
+# from pathlib import exists
 
 # Import 'time' to keep track of the time
 import time
@@ -42,67 +41,8 @@ import time
 # if gpu is to be used, otherwise use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-Transition = namedtuple('Transition',
-                        ('currentState', 'action', 'nextState', 'reward'))
-
-class ReplayMemory(object):
-    """
-    Replay Memory class
-
-    Parameters:
-        capacity (int): The maximum number of experiences that can be stored in memory.
-
-    Attributes:
-        memory (deque): A deque containing the experiences.
-    """
-
-    def __init__(self, capacity):
-        self.memory = deque([], maxlen=capacity)
-
-    def push(self, *args):
-        """Save a transition"""
-        self.memory.append(Transition(*args))
-
-    def sample(self, batch_size):
-        return random.sample(self.memory, batch_size)
-
-    def __len__(self):
-        return len(self.memory)
-
-
-class DQN(nn.Module):
-    """
-    Deep Q Network class
-
-    Parameters:
-        inputSize (int): The size of the flattened input state (7x7 matrix of tile IDs).
-        numActions (int): The number of possible actions (left, right, move forward).
-        hiddenLayerSize (tuple): The size of the hidden layers. Defaults to (512, 256).
-
-    Attributes:
-        fc1 (torch.nn.Linear): The first fully connected layer.
-        fc2 (torch.nn.Linear): The second fully connected layer.
-        fc3 (torch.nn.Linear): The third fully connected layer.
-
-    Returns:
-        torch.nn.Module: A PyTorch neural network module.
-    """
-
-    def __init__(self, inputSize, numActions, hiddenLayerSize=(512, 256)):
-        super(DQN, self).__init__()
-        self.fc1 = nn.Linear(inputSize, hiddenLayerSize[0])
-        self.fc2 = nn.Linear(hiddenLayerSize[0], hiddenLayerSize[1])
-        self.fc3 = nn.Linear(hiddenLayerSize[1], numActions)
-
-    # Called with either one element to determine next action, or a batch
-    # during optimization. Returns tensor([[left0exp,right0exp]...]).
-    def forward(self, x):
-        x = x.to(device)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+# Define a named tuple to store the experiences
+Transition = namedtuple("Transition", ("currentState", "action", "nextState", "reward"))
 
 
 def create_minigrid_environment(grid_type="MiniGrid-Empty-8x8-v0", render_mode=None):
@@ -241,3 +181,132 @@ def load_model(filename):
     print("Loading existing model")
     model = torch.load(filename)
     return model
+
+
+class DQN(nn.Module):
+    """
+    Deep Q Network class
+
+    Parameters:
+        inputSize (int): The size of the flattened input state (7x7 matrix of tile IDs).
+        numActions (int): The number of possible actions (left, right, move forward).
+        hiddenLayerSize (tuple): The size of the hidden layers. Defaults to (512, 256).
+
+    Attributes:
+        fc1 (torch.nn.Linear): The first fully connected layer.
+        fc2 (torch.nn.Linear): The second fully connected layer.
+        fc3 (torch.nn.Linear): The third fully connected layer.
+
+    Returns:
+        torch.nn.Module: A PyTorch neural network module.
+    """
+
+    def __init__(self, inputSize, numActions, hiddenLayerSize=(64, 128)):
+        super(DQN, self).__init__()
+        self.fc1 = nn.Linear(inputSize, hiddenLayerSize[0])
+        self.fc2 = nn.Linear(hiddenLayerSize[0], hiddenLayerSize[1])
+        self.fc3 = nn.Linear(hiddenLayerSize[1], numActions)
+
+    # Called with either one element to determine next action, or a batch
+    # during optimization. Returns tensor([[left0exp,right0exp]...]).
+    def forward(self, x):
+        x = x.to(device)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+    
+
+def select_action_e_greedy(state, stop_epsilon, start_epsilon, decay_rate, steps_done, numActions, policy_net):
+    """
+    Select an action using an epsilon-greedy policy
+
+    Parameters:
+        state (torch.Tensor): The current state
+        stop_epsilon (float): The epsilon value to stop decaying at
+        start_epsilon (float): The epsilon value to start decaying at
+        decay_rate (float): The rate at which to decay the epsilon value
+        steps_done (int): The number of steps taken so far
+        numActions (int): The number of possible actions
+        policy_net (DQN): The policy network
+
+    Returns:
+        int: The selected action
+    """
+
+    # generate a random number
+    sample = random.random()
+    
+    # calculate the epsilon threshold, based on the epsilon-start value, the epsilon-stop value, 
+    # the number of training steps taken and the epsilon decay rate
+    # here we are using an exponential decay rate for the epsilon value
+    eps_threshold = stop_epsilon+(start_epsilon-stop_epsilon)*math.exp(-1. * steps_done / decay_rate)
+    
+    # compare the generated random number to the epsilon threshold
+    if sample > eps_threshold:
+        # act greedily towards the Q-values of our policy network, given the state
+        
+        # we do not want to gather gradients as we are only generating experience, not training the network
+        with torch.no_grad():
+            # t.max(1) will return largest column value of each row.
+            # second column on max result is index of where max element was
+            # found, so we pick action with the larger expected reward.
+            return policy_net(state).max(1)[1].unsqueeze(0)
+    else:
+        # select a random action with equal probability
+        return torch.tensor([[random.randrange(numActions)]], device=device, dtype=torch.long)
+    
+class ReplayMemory(object):
+    """
+    Replay Memory class
+
+    Parameters:
+        capacity (int): The maximum number of experiences that can be stored in memory.
+
+    Attributes:
+        memory (deque): A deque containing the experiences.
+    """
+
+    def __init__(self, capacity):
+        self.memory = deque([], maxlen=capacity)
+
+    def push(self, *args):
+        """Save a transition"""
+        self.memory.append(Transition(*args))
+
+    def sample(self, batch_size):
+        return random.sample(self.memory, batch_size)
+
+    def __len__(self):
+        return len(self.memory)
+
+def update_target_net(policy_net, target_net):
+    """
+    Update the target network with the weights and biases of the policy network
+
+    Parameters:
+        policy_net (DQN): The policy network
+        target_net (DQN): The target network
+    """
+
+    target_net.load_state_dict(policy_net.state_dict())
+
+def device_specific_episodes(episodes):
+    """
+    Select the device to use for training and scale the number of episodes accordingly, if using GPU
+
+    Parameters:
+        episodes (int): The number of episodes to train for
+
+    Returns:
+        str: The device to use for training
+    """
+
+    # if gpu is to be used, otherwise use cpu
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Run for more episodes if using GPU
+    if device=="cuda":
+        return episodes*10
+    else:
+        return episodes

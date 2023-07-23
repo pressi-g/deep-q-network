@@ -18,7 +18,7 @@ gamma: 0.90                 # Discounting rate
 # Exploration parameters for epsilon greedy strategy
 start_epsilon: 1.0          # exploration probability at start
 stop_epsilon: 0.01          # minimum exploration probability 
-decay_rate: 20000           # exponential decay rate for exploration prob
+decay_rate: 20000           # exponential decay rate for exploration probability
 
 # MEMORY HYPERPARAMETERS
 pretrain_length: 128        # Number of experiences stored in the Memory when initialized for the first time

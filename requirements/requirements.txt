@@ -6,6 +6,5 @@ minigrid
 torch
 torchvision
 tensorboard
-metrohash
 torch-tb-profiler
 pyyaml
