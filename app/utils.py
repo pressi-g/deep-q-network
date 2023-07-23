@@ -161,7 +161,7 @@ def save_model(policy_net, filename):
         policy_net (DQN): The policy network
         filename (str): The filename to save the model to
     """
-    torch.save(policy_net, filename)
+    torch.save(policy_net.state_dict(), filename)
 
 
 def load_model(filename):

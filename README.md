@@ -5,7 +5,7 @@ This repository contains an implementation of Deep Q-Network (DQN) applied to th
 The MiniGridWorld environment consists of a 2D grid representing an empty room. The agent's goal is to navigate the grid and reach the green goal square, which provides a sparse reward. The agent receives a small penalty for the number of steps taken to reach the goal.
 
 <div style="display: flex; justify-content: center;">
-  <img src="app/optimal_policies_render.gif" alt="solution">
+  <img src="app/dqn.gif" alt="solution">
 </div>
 
 ## Introduction
@@ -64,21 +64,30 @@ To run this code, you need to have Python 3.8 and pip installed on your system. 
    pip install -r requirements.txt
    ```
 
-6. Run the training script to train the DQN agent:
+6. To view and render the optimal policy run the `render_optimal_policy.py` script:
 
    ```
-   python3 train.py
+   python3 render_optimal_policy.py
+   ```
+
+   This will load the trained model and render the optimal policy of the agent in the MiniGridWorld environment.
+
+7. To evaluate the trained agent, run the `main.py` script with the `train` variable set to `False`:
+
+   ```
+   python3 main.py
+   ```
+
+   This will load the trained model and evaluate the agent's performance in the MiniGridWorld environment.
+
+8. To train agent from scratch, run main.py but change the `train` variable to `True`:
+
+   ```
+   python3 main.py
    ```
 
    This will train the agent using the default hyperparameters and save the trained model.
 
-7. Run the evaluation script to evaluate the trained DQN agent:
-
-   ```
-   python3 evaluate.py
-   ```
-
-   This will load the trained model and evaluate the agent's performance in the MiniGridWorld environment.
 
 You can modify the hyperparameters in the `train.py` script to experiment with different settings and observe their impact on the agent's learning.
 
@@ -88,31 +97,49 @@ The directory structure of this repository is as follows:
 
 ```
 └── app
-└── README.md
-└── requirements.txt
+|   └── models
+|   |   └── trained_model.pth           # Directory to save the trained model file
+|   ├── __init__.py
+|   ├── deep_q_learning.py              # Script for the DQN implementation
+|   ├── evaluate.py                     # Script for evaluating the trained DQN agent
+|   ├── main.py                         # Main script to control training or evaluation
+|   ├── render_optimal_policy.py        # Script to visualize the optimal policy of DQN agent
+|   ├── train.py                        # Script for training the DQN agent
+|   └── utils.py                        # Utility functions used in the implementation
+└── requirements
+|     └── requirements.txt              # File containing required Python packages
+|     └── test_requirements.txt         # File containing required packages for testing
+└── .gitignore                          # File specifying files/directories to ignore in version control
+└── README.md                           # Readme file with information about the project
 └── tests
-   └── unit-tests
+   └── unit-tests                       # Directory containing unit test scripts
    |   ├── ...
    |   └── ...
-   └── integration-tests
+   └── integration-tests                # Directory containing integration test scripts
       ├── ...
       └── ...
+
 ```
 
 Here's a brief description of the files and directories in this repository:
 
 - `app`: Contains the main application code.
-  - `.gitignore`: Specifies files and directories to be ignored by Git version control.
-  - `evaluate.py`: Evaluates the trained DQN agent by running it in the MiniGridWorld environment.
-  - `train.py`: Training script to train the DQN agent using the MiniGridWorld environment.
-  - `dqn.py`: Implements the Deep Q-Network algorithm.
-  - `model.py`: Defines the architecture of the neural network used by the DQN agent.
-  - `utils.py`: Contains utility functions used in the application.
-- `README.md`: The main documentation file providing an overview of the project.
-- `requirements.txt`: Lists the required Python dependencies for the project.
+  - `models`: Directory to save the trained model file (`trained_model.pth`).
+  - `__init__.py`
+  - `deep_q_learning.py`: Script for the DQN implementation.
+  - `evaluate.py`: Script for evaluating the trained DQN agent.
+  - `main.py`: Main script to control training or evaluation.
+  - `render_optimal_policy.py`: Script to visualize the optimal policy of the DQN agent.
+  - `train.py`: Script for training the DQN agent.
+  - `utils.py`: Utility functions used in the implementation.
+- `requirements`: Contains required Python dependencies for the project.
+  - `requirements.txt`: File containing required Python packages.
+  - `test_requirements.txt`: File containing required packages for testing.
+- `.gitignore`: File specifying files/directories to ignore in version control.
+- `README.md`: Readme file with information about the project.
 - `tests`: Contains unit and integration tests for the application.
-  - `unit-tests`: Directory for unit tests.
-  - `integration-tests`: Directory for integration tests.
+  - `unit-tests`: Directory containing unit test scripts.
+  - `integration-tests`: Directory containing integration test scripts.
 
 Feel free to explore the code files, modify them, and experiment with different settings to understand and improve the Deep Q-Network (DQN) algorithm on MiniGridWorld.
 
