@@ -22,7 +22,7 @@
 # from utils import *
 
 
-# ### MODEL HYPERPARAMETERS 
+# ### MODEL HYPERPARAMETERS
 # numActions = 3               # 3 possible actions: left, right, move forward
 # inputSize = 49               # size of the flattened input state (7x7 matrix of tile IDs)
 
@@ -37,7 +37,7 @@
 
 # # Exploration parameters for epsilon greedy strategy
 # start_epsilon = 0.9         # exploration probability at start
-# stop_epsilon = 0.05          # minimum exploration probability 
+# stop_epsilon = 0.05          # minimum exploration probability
 # decay_rate = 3000           # exponential decay rate for exploration prob
 
 # ### MEMORY HYPERPARAMETERS
@@ -49,7 +49,7 @@
 # evalEpisodes = 1000          # Number of episodes to be used for evaluation
 
 # # Change this to 'False' if you only want to evaluate a previously trained agent
-# train = False     
+# train = False
 
 # # Update the number of episodes if training on GPU
 # episodes = device_specific_episodes(episodes)
@@ -62,16 +62,16 @@
 # def select_action(state):
 #     # generate a random number
 #     sample = random.random()
-    
-#     # calculate the epsilon threshold, based on the epsilon-start value, the epsilon-stop value, 
+
+#     # calculate the epsilon threshold, based on the epsilon-start value, the epsilon-stop value,
 #     # the number of training steps taken and the epsilon decay rate
 #     # here we are using an exponential decay rate for the epsilon value
 #     eps_threshold = stop_epsilon+(start_epsilon-stop_epsilon)*math.exp(-1. * steps_done / decay_rate)
-    
+
 #     # compare the generated random number to the epsilon threshold
 #     if sample > eps_threshold:
 #         # act greedily towards the Q-values of our policy network, given the state
-        
+
 #         # we do not want to gather gradients as we are only generating experience, not training the network
 #         with torch.no_grad():
 #             # t.max(1) will return largest column value of each row.
@@ -81,13 +81,13 @@
 #     else:
 #         # select a random action with equal probability
 #         return torch.tensor([[random.randrange(numActions)]], device=device, dtype=torch.long)
-    
+
 # def optimize_model():
 
 #     # Perform one step of the optimization
 #     if len(memory) < batch_size:
-#         return 
-    
+#         return
+
 #     # Sample a mini-batch from the replay memory
 #     transitions = memory.sample(batch_size)
 #     batch = Transition(*zip(*transitions))
@@ -119,7 +119,7 @@
 #     # Configure the MSELoss
 #     criterion = nn.MSELoss()
 
-#     # Calculate the loss for the mini-batch. 
+#     # Calculate the loss for the mini-batch.
 #     # Make sure to resize the TD-targets to be the same shape as the state-action values tensor
 #     loss = criterion(state_action_values, TDtargets.unsqueeze(1))
 
@@ -128,12 +128,12 @@
 
 #     # calculate the gradients by backpropagation from the loss function
 #     loss.backward()
-        
+
 #     # We clamp the gradients in the policy network to the range [-1,1]
 #     # This also helps keep training stable
 #     for param in policy_net.parameters():
 #         param.grad.data.clamp_(-1, 1)
-        
+
 #     # Update the network parameters of the policy network using the optimizer
 #     optimizer.step()
 # # Make the environment
@@ -141,7 +141,7 @@
 
 # # use wrapper to only extract observation
 # env = ImgObsWrapper(env)
-    
+
 # # Instantiate the policy network and the target network
 # hiddenLayerSize = (128,128)
 # policy_net = DQN(inputSize, numActions, hiddenLayerSize)
@@ -152,7 +152,7 @@
 
 # # We don't want to update the parameters of the target network so we set it to evaluation mode
 # target_net.eval()
-    
+
 # Transition = namedtuple('Transition',
 #                         ('currentState', 'action', 'nextState', 'reward'))
 
@@ -182,7 +182,7 @@
 
 #         state = preprocess(obs)
 #         total_reward = 0
-        
+
 #         for step in range(max_steps):
 #             # Choose an action using epsilon-greedy strategy
 #             # action = select_action_e_greedy(state, stop_epsilon, start_epsilon, decay_rate, steps_done, numActions, policy_net)
@@ -198,7 +198,7 @@
 #                 next_state = None
 
 #             # Store the transition in the replay memory
-#             memory.push(state, action, next_state, torch.tensor([reward], device=device))   
+#             memory.push(state, action, next_state, torch.tensor([reward], device=device))
 
 #             # Move to the next state
 #             state = next_state
@@ -231,7 +231,7 @@
 #         # if episode % 100 == 0:
 
 #     torch.save(policy_net.state_dict(), f'./models/{episode}.pth')
-                       
+
 #     print('Finished training!')
 #     writer.flush()
 #     writer.close()

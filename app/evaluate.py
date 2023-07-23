@@ -24,7 +24,7 @@ from train import *
 
 ### TESTING HYPERPARAMETERS
 # Evaluation hyperparameter
-evalEpisodes = 1000          # Number of episodes to be used for evaluation
+evalEpisodes = 1000  # Number of episodes to be used for evaluation
 
 
 # Set the random seed for reproducible experiments
@@ -33,11 +33,12 @@ random.seed(5)
 
 max_steps = env.max_steps
 
+
 def evaluate_model():
     # Evaluation loop
-    print('Starting evaluation...')
+    print("Starting evaluation...")
     # Set the path to the saved model
-    model_path = 'models/trained_model.pth'
+    model_path = "models/trained_model.pth"
 
     # policy_net = DQN(inputSize, numActions, hiddenLayerSize)
     # update policy_net with model
@@ -80,18 +81,32 @@ def evaluate_model():
                 totalReward += reward
                 totalSteps += env.step_count
                 if done:
-                    print('Finished evaluation episode %d with reward %f, %d steps, reaching the goal' % (e, reward, env.step_count))
+                    print(
+                        "Finished evaluation episode %d with reward %f, %d steps, reaching the goal"
+                        % (e, reward, env.step_count)
+                    )
                     finishCounter += 1
                 if truncated:
-                    print('Failed evaluation episode %d with reward %f, %d steps' % (e, reward, env.step_count))
+                    print(
+                        "Failed evaluation episode %d with reward %f, %d steps"
+                        % (e, reward, env.step_count)
+                    )
                 break
 
             # Move to the next state
             currentState = nextState
 
     # Print a summary of the evaluation results
-    print('Completion rate %.2f with an average reward %0.4f and average steps %0.2f' % (finishCounter / evalEpisodes, totalReward / evalEpisodes, totalSteps / evalEpisodes))
-    print('Finished evaluation!')
+    print(
+        "Completion rate %.2f with an average reward %0.4f and average steps %0.2f"
+        % (
+            finishCounter / evalEpisodes,
+            totalReward / evalEpisodes,
+            totalSteps / evalEpisodes,
+        )
+    )
+    print("Finished evaluation!")
+
 
 if __name__ == "__main__":
     evaluate_model()

@@ -15,9 +15,9 @@ def render_optimal_policy():
     """
 
     # Evaluation loop
-    print('Start render...')
+    print("Start render...")
     # Set the path to the saved model
-    model_path = 'models/trained_model.pth'
+    model_path = "models/trained_model.pth"
 
     policy_net = DQN(inputSize, numActions, hiddenLayerSize)
     # update policy_net with model
@@ -58,7 +58,6 @@ def render_optimal_policy():
 
 
 def main():
-
     # Render the optimal policy
     render_optimal_policy()
 
